@@ -3,7 +3,7 @@
 // réseau faible (le réseau d'abord y faisait attendre jusqu'à 3 s), puis ses fichiers sont redemandés
 // en arrière-plan pour l'ouverture suivante — une version publiée se voit donc une ouverture plus tard.
 // ⚠️ Ne cache rien à GitHub : le navigateur revérifie de lui-même ce fichier à chaque ouverture en ligne.
-const CACHE = 'webaa-1';
+const CACHE = 'webaa-2';
 const FILES = ['./', 'index.html', 'config.js', 'certs.js', 'favicon.svg'];
 
 self.addEventListener('install', (e) => {
