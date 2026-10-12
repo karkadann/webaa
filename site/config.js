@@ -6,5 +6,5 @@
 //   port  : port WebTransport de l'app (UDP, QUIC).
 window.WEBSTREAM_CONFIG = {
   addrs: ['7.7.7.1', 'webaa.local'],
-  port: 3333,
+  port: 3334,
 };
