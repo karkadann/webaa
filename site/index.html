@@ -22,6 +22,9 @@
   Les autres paramètres (?diag=1, ?d=broadway) sont lus par la page de l'app.
 
   Pas de stream : rien d'autre qu'une ligne discrète, et un nouvel essai toutes les 3 s.
+  Triple tap (ou triple clic) n'importe où, tant que cette page est là : la page servie par l'app
+  elle-même, http://7.7.7.1 (config.js, `local`), sans WebTransport — le secours quand le lien ne s'établit pas
+  (heure de l'appareil fausse après un redémarrage : certificat périmé pour le navigateur).
 -->
 <html lang="en">
 <head>
@@ -44,7 +47,7 @@
     'use strict';
 
     // ---- Réglages ---------------------------------------------------------------------------------
-    const CFG = Object.assign({ addrs: ['3.3.3.1'], port: 3333 }, window.WEBSTREAM_CONFIG || {});
+    const CFG = Object.assign({ addrs: ['3.3.3.1'], port: 3333, local: 'http://7.7.7.1/' }, window.WEBSTREAM_CONFIG || {});
     const PATH = '/webstream';
     const TRY_MS = 4000;          // un essai (une adresse) sans réponse est abandonné
     const RETRY_MS = 3000;        // entre deux tours sans stream
@@ -52,6 +55,18 @@
 
     const msgEl = document.getElementById('msg');
     const say = (t) => { msgEl.textContent = t; };
+
+    // ---- Triple tap : la page de l'app, servie par l'app (cf. l'en-tête) ------------------------------
+    // Seulement tant que cette page est là : une fois la page de l'app chargée, ses touchers vont à
+    // l'appareil (`ceded`, en plus de document.open qui retire les écouteurs).
+    const TAPS = 3, TAP_MS = 600;   // trois touchers, chacun à moins de 600 ms du précédent
+    let taps = 0, lastTap = -Infinity, ceded = false;
+    window.addEventListener('pointerdown', (e) => {
+      if (ceded || !e.isPrimary) return;
+      taps = e.timeStamp - lastTap < TAP_MS ? taps + 1 : 1;
+      lastTap = e.timeStamp;
+      if (taps >= TAPS) { taps = 0; location.href = CFG.local; }
+    });
 
     const params = new URLSearchParams(location.search);
     const addrs = (params.get('a') || '').split(',').map((s) => s.trim()).filter(Boolean);
@@ -352,6 +367,7 @@
       catch (e) { say('Stream found, page not loaded: ' + e.message); setTimeout(() => location.reload(), RETRY_MS); return; }
       // La page de l'app prend le document ; elle trouve le lien ici (cf. son `HOSTED`).
       window.WEBSTREAM = link;
+      ceded = true;
       document.open();
       document.write(html);
       document.close();

@@ -4,7 +4,9 @@
 //           - webaa.local : mDNS activé (option CONF.), résolu vers l'IP réelle du hotspot. Chromium
 //             seulement (Firefox ne résout pas .local). ?a=webaa.local pour forcer.
 //   port  : port WebTransport de l'app (UDP, QUIC).
+//   local : la page servie par l'app elle-même, ouverte par un triple tap (sans WebTransport).
 window.WEBSTREAM_CONFIG = {
   addrs: ['7.7.7.1', 'webaa.local'],
   port: 3334,
+  local: 'http://7.7.7.1/',
 };
